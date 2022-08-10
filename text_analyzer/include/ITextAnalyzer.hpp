@@ -10,6 +10,8 @@
  */
 #pragma once
 
+#include<string>
+
 /**
  * @brief TODO
  * 
@@ -21,11 +23,11 @@ class ITextAnalyzer
          * @brief 
          * 
          */
-        virtual void findSmileyPositions() = 0;
+        virtual void findSmileyPositions(std::string) = 0;
         
         /**
          * @brief 
          * 
          */
-        virtual void findTenMostUsedWords() = 0;
+        virtual void findTenMostUsedWords(std::string) = 0;
 };

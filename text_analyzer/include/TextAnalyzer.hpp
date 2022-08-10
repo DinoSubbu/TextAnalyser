@@ -10,6 +10,9 @@
  */
 #pragma once
 #include "ITextAnalyzer.hpp"
+#include <string>
+#include <vector>
+#include <sstream>
 
 /**
  * @brief TODO
@@ -22,11 +25,32 @@ class TextAnalyzer : public ITextAnalyzer
          * @brief 
          * 
          */
-        void findSmileyPositions() override;
+        void findSmileyPositions(std::string) override;
         
         /**
          * @brief 
          * 
          */
-        void findTenMostUsedWords() override;
+        void findTenMostUsedWords(std::string) override;
+
+        void writeOutputToConsole();
+        void writeOutputToTextFile();
+        void writeOutputToXMLFile();
+    private:
+        /**
+         * @brief 
+         * 
+         * @param input_text 
+         */
+        void removeExtraSpaces(std::string& input_text);
+        void convertToLowerCase(std::string& input_text);
+        void removePunctuations(std::string& input_text);
+        void processInput(std::string& input_text);
+        void tokenize(std::string input_text);
+
+        std::vector<std::string> wordsVec{};
+        std::stringstream smileyPositions{};
+        std::stringstream frequentTenWords{};
+        std::vector<std::string> wordsVector{};
+        
 };
