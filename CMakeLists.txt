@@ -14,7 +14,7 @@ include_directories(
 add_subdirectory(text_analyzer)
 
 add_executable(TextAnalyzerTool ${Sources})
-
+target_compile_features(TextAnalyzerTool PRIVATE cxx_std_17)
 target_link_libraries(TextAnalyzerTool PUBLIC
 TextAnalyzer
 Boost::program_options

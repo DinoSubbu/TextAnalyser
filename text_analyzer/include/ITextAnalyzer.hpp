@@ -28,16 +28,16 @@ class ITextAnalyzer
         /**
          * @brief Find smiley postions from the input file
          * 
-         * @param file_path 
+         * @param file_path path of the text file containing input data
          */
-        virtual void findSmileyPositions(std::string) = 0;
+        virtual void findSmileyPositions(const std::string& file_path) = 0;
         
         /**
          * @brief Find frequently used 10 words from the input file
          * 
-         * @param file_path 
+         * @param file_path path of the text file containing input data
          */
-        virtual void findTenMostUsedWords(std::string) = 0;
+        virtual void findTenMostUsedWords(const std::string& file_path) = 0;
 
         /**
          * @brief Write frequent 10 words and smiley positions to the console

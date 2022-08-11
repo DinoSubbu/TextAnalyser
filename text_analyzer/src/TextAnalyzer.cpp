@@ -15,9 +15,8 @@ namespace pt = boost::property_tree;
  * @brief read the input file from the path specified and push the content to a string variable
  * 
  * @param file_path 
- * @return std::string 
  */
-std::string read_string_from_file(std::string file_path) {
+void TextAnalyzer::read_string_from_file(const std::string& file_path, std::string& outputString) const {
     const std::ifstream input_stream(file_path, std::ios_base::binary);
 
     if (input_stream.fail()) {
@@ -28,7 +27,7 @@ std::string read_string_from_file(std::string file_path) {
     std::stringstream buffer;
     buffer << input_stream.rdbuf();
 
-    return buffer.str();
+    outputString = buffer.str();
 }
 
 /**
@@ -36,13 +35,14 @@ std::string read_string_from_file(std::string file_path) {
  * 
  * @param file_path 
  */
-void TextAnalyzer::findSmileyPositions(std::string file_path)
+void TextAnalyzer::findSmileyPositions(const std::string& file_path)
 {
-    std::regex smileyPattern(":\\(|:\\)|:-\\]|:-\\[|:\\]|:\\[|:-\\(|:-\\)");
-    std::string input_text =read_string_from_file(file_path);
+    std::regex smileyRegexPattern(":\\(|:\\)|:-\\]|:-\\[|:\\]|:\\[|:-\\(|:-\\)");
+    std::string input_text{};
+    read_string_from_file(file_path, input_text);
     smileyPositions << "Smileys and their positions :\n";
 
-    for(auto i = std::sregex_iterator(input_text.begin(), input_text.end(), smileyPattern);
+    for(auto i = std::sregex_iterator(input_text.begin(), input_text.end(), smileyRegexPattern);
            i != std::sregex_iterator();
            ++i)
     {
@@ -59,9 +59,10 @@ void TextAnalyzer::findSmileyPositions(std::string file_path)
  * 
  * @param file_path 
  */
-void TextAnalyzer::findTenMostUsedWords(std::string file_path)
+void TextAnalyzer::findTenMostUsedWords(const std::string& file_path)
 {
-    std::string input_text =read_string_from_file(file_path);
+    std::string input_text{};
+    read_string_from_file(file_path, input_text);
     processInput(input_text);
 
     std::unordered_map<std::string, int> frequency;
@@ -125,25 +126,24 @@ void TextAnalyzer::writeOutputToXMLFile()
     pt::ptree tree;
     int i = 1;
     for(auto &word: wordsVector){
-        std::string temp{"TextAnalyzer.Frequent10Words."};
-        temp = temp + std::to_string(i);
-        tree.add(temp, word);
+        std::string tagToAdd{"TextAnalyzer.Frequent10Words."};
+        tagToAdd = tagToAdd + std::to_string(i);
+        tree.add(tagToAdd, word);
         ++i;
     }
     for(const auto &smileyWithPosition: smileysWithPosition){
-        std::cout << "Dino " << smileyWithPosition.first << smileyWithPosition.second << std::endl;
-        std::string temp{"TextAnalyzer.SmileyPosition."};
-        temp = temp + smileyWithPosition.first;
-        auto existingValue = tree.get_optional<std::string>(temp);
+        std::string tag{"TextAnalyzer.SmileyPosition."};
+        tag = tag + smileyWithPosition.first;
+        auto existingValue = tree.get_optional<std::string>(tag);
         if (existingValue.has_value())
         {
-            std::string positionToInsert{existingValue.value()};
-            positionToInsert.append(", " + std::to_string(smileyWithPosition.second));
-            tree.put(temp, positionToInsert);
+            std::string valueToInsert{existingValue.value()};
+            valueToInsert.append(", " + std::to_string(smileyWithPosition.second));
+            tree.put(tag, valueToInsert);
         }
         else
         {
-            tree.add(temp, std::to_string(smileyWithPosition.second));
+            tree.add(tag, std::to_string(smileyWithPosition.second));
         }
     }
     pt::xml_writer_settings<std::string> settings('\t', 1);
@@ -155,7 +155,7 @@ void TextAnalyzer::writeOutputToXMLFile()
  * 
  * @param input_text 
  */
-void TextAnalyzer::removeExtraSpaces(std::string& input_text) {
+void TextAnalyzer::removeExtraSpaces(std::string& input_text) const {
     auto new_end_position = std::unique(input_text.begin(), input_text.end(), [] (char left, char right) {
         return ((left == right) && (left == ' '));
     });
@@ -171,7 +171,7 @@ void TextAnalyzer::removeExtraSpaces(std::string& input_text) {
  * 
  * @param input_text 
  */
-void TextAnalyzer::convertToLowerCase(std::string& input_text) {
+void TextAnalyzer::convertToLowerCase(std::string& input_text) const {
     std::for_each(input_text.begin(), input_text.end(), [] (char& alphabet) {
         alphabet = std::tolower(alphabet);
     });
@@ -183,7 +183,7 @@ void TextAnalyzer::convertToLowerCase(std::string& input_text) {
  * 
  * @param input_text 
  */
-void TextAnalyzer::tokenize(std::string input_text) {
+void TextAnalyzer::tokenize(const std::string& input_text) {
     std::string word = "";
     for(auto alphabet: input_text) {
         if(alphabet == ' ') {
@@ -205,7 +205,7 @@ void TextAnalyzer::tokenize(std::string input_text) {
  * 
  * @param input_text 
  */
-void TextAnalyzer::removePunctuations(std::string& input_text) {
+void TextAnalyzer::removePunctuations(std::string& input_text) const {
     auto new_end_position = std::remove_if(input_text.begin(), input_text.end(), ispunct);
     input_text.erase(new_end_position, input_text.end());
 }

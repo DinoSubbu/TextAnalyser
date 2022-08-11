@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 #include "TextAnalyzer.hpp"
 #include <fstream>
+#include <filesystem>
+
+using std::filesystem::current_path;
+std::string CWD = current_path().string() + "/../../../text_analyzer/unit_test/test_data/";
 
 bool compareOutput(std::string actualResultPath,std::string expectedOutput)
 {
@@ -11,8 +15,6 @@ bool compareOutput(std::string actualResultPath,std::string expectedOutput)
     	actualOutputString += (buffer + '\n');
 	if(actualOutputString.compare(expectedOutput) == 0)
 		return true;
-	std::cout<<actualOutputString<<std::endl;
-	std::cout<<expectedOutput<<std::endl;
 	return false;
 }
 
@@ -21,8 +23,9 @@ const std::string outputTxtFilePath = ".//TextAnalyzerOutput.txt";
 TEST(TextAnalyzerTests, InputFileWithLessThan10Words) {
 	TextAnalyzer textAnalyzer{};
 	const std::string expectedOutput = {"Smileys and their positions :\n:) --> 22\nMost frequent 10 words :\n1.cxx\n2.executable\n3.linking\n"};
-    textAnalyzer.findTenMostUsedWords("..//text_analyzer//unit_test//test_data//InputFileWithLessThan10Words.txt");
-	textAnalyzer.findSmileyPositions("..//text_analyzer//unit_test//test_data//InputFileWithLessThan10Words.txt");
+	std::string inputFilePath = CWD + "InputFileWithLessThan10Words.txt";
+    textAnalyzer.findTenMostUsedWords(inputFilePath);
+	textAnalyzer.findSmileyPositions(inputFilePath);
 	textAnalyzer.writeOutputToTextFile();
 	ASSERT_TRUE(compareOutput(outputTxtFilePath, expectedOutput));
 }
@@ -30,8 +33,9 @@ TEST(TextAnalyzerTests, InputFileWithLessThan10Words) {
 TEST(TextAnalyzerTests, InputFileWithMoreThan10Words) {
 	TextAnalyzer textAnalyzer{};
 	const std::string expectedOutput = {"Smileys and their positions :\n:) --> 22\n:) --> 47\n:) --> 72\n:) --> 97\nMost frequent 10 words :\n1.cxx\n2.executable\n3.linking\n"};
-    textAnalyzer.findTenMostUsedWords("..//text_analyzer//unit_test//test_data//InputFileWithMoreThan10Words.txt");
-	textAnalyzer.findSmileyPositions("..//text_analyzer//unit_test//test_data//InputFileWithMoreThan10Words.txt");
+	std::string inputFilePath = CWD + "InputFileWithMoreThan10Words.txt";
+    textAnalyzer.findTenMostUsedWords(inputFilePath);
+	textAnalyzer.findSmileyPositions(inputFilePath);
 	textAnalyzer.writeOutputToTextFile();
 	ASSERT_TRUE(compareOutput(outputTxtFilePath, expectedOutput));
 }
@@ -39,8 +43,9 @@ TEST(TextAnalyzerTests, InputFileWithMoreThan10Words) {
 TEST(TextAnalyzerTests, EmptyInputFile) {
 	TextAnalyzer textAnalyzer{};
 	const std::string expectedOutput = {"Smileys and their positions :\nMost frequent 10 words :\n"};
-    textAnalyzer.findTenMostUsedWords("..//text_analyzer//unit_test//test_data//EmptyInputFile.txt");
-	textAnalyzer.findSmileyPositions("..//text_analyzer//unit_test//test_data//EmptyInputFile.txt");
+    std::string inputFilePath = CWD + "EmptyInputFile.txt";
+    textAnalyzer.findTenMostUsedWords(inputFilePath);
+	textAnalyzer.findSmileyPositions(inputFilePath);
 	textAnalyzer.writeOutputToTextFile();
 	ASSERT_TRUE(compareOutput(outputTxtFilePath, expectedOutput));
 }
@@ -48,8 +53,9 @@ TEST(TextAnalyzerTests, EmptyInputFile) {
 TEST(TextAnalyzerTests, InputFileWithOnlyText) {
 	TextAnalyzer textAnalyzer{};
 	const std::string expectedOutput = {"Smileys and their positions :\nMost frequent 10 words :\n1.linking\n2.cxx\n3.executable\n"};
-    textAnalyzer.findTenMostUsedWords("..//text_analyzer//unit_test//test_data//InputFileWithOnlyText.txt");
-	textAnalyzer.findSmileyPositions("..//text_analyzer//unit_test//test_data//InputFileWithOnlyText.txt");
+    std::string inputFilePath = CWD + "InputFileWithOnlyText.txt";
+    textAnalyzer.findTenMostUsedWords(inputFilePath);
+	textAnalyzer.findSmileyPositions(inputFilePath);
 	textAnalyzer.writeOutputToTextFile();
 	ASSERT_TRUE(compareOutput(outputTxtFilePath, expectedOutput));
 }
@@ -57,8 +63,9 @@ TEST(TextAnalyzerTests, InputFileWithOnlyText) {
 TEST(TextAnalyzerTests, InputFileWithOnlySmileys) {
 	TextAnalyzer textAnalyzer{};
 	const std::string expectedOutput = {"Smileys and their positions :\n:) --> 0\n:-[ --> 2\n:( --> 6\nMost frequent 10 words :\n"};
-    textAnalyzer.findTenMostUsedWords("..//text_analyzer//unit_test//test_data//InputFileWithOnlySmileys.txt");
-	textAnalyzer.findSmileyPositions("..//text_analyzer//unit_test//test_data//InputFileWithOnlySmileys.txt");
+    std::string inputFilePath = CWD + "InputFileWithOnlySmileys.txt";
+    textAnalyzer.findTenMostUsedWords(inputFilePath);
+	textAnalyzer.findSmileyPositions(inputFilePath);
 	textAnalyzer.writeOutputToTextFile();
 	ASSERT_TRUE(compareOutput(outputTxtFilePath, expectedOutput));
 }
@@ -66,8 +73,9 @@ TEST(TextAnalyzerTests, InputFileWithOnlySmileys) {
 TEST(TextAnalyzerTests, InputFileWithUnsupportedSmileys) {
 	TextAnalyzer textAnalyzer{};
 	const std::string expectedOutput = {"Smileys and their positions :\n:) --> 5\n:-) --> 12\nMost frequent 10 words :\n"};
-    textAnalyzer.findTenMostUsedWords("..//text_analyzer//unit_test//test_data//InputFileWithUnsupportedSmileys.txt");
-	textAnalyzer.findSmileyPositions("..//text_analyzer//unit_test//test_data//InputFileWithUnsupportedSmileys.txt");
+    std::string inputFilePath = CWD + "InputFileWithUnsupportedSmileys.txt";
+    textAnalyzer.findTenMostUsedWords(inputFilePath);
+	textAnalyzer.findSmileyPositions(inputFilePath);
 	textAnalyzer.writeOutputToTextFile();
 	ASSERT_TRUE(compareOutput(outputTxtFilePath, expectedOutput));
 }
@@ -75,8 +83,9 @@ TEST(TextAnalyzerTests, InputFileWithUnsupportedSmileys) {
 TEST(TextAnalyzerTests, InputFileWithPunctuations) {
 	TextAnalyzer textAnalyzer{};
 	const std::string expectedOutput = {"Smileys and their positions :\nMost frequent 10 words :\n1.cxx\n2.executable\n3.linking\n4.running\n"};
-    textAnalyzer.findTenMostUsedWords("..//text_analyzer//unit_test//test_data//InputFileWithPunctuations.txt");
-	textAnalyzer.findSmileyPositions("..//text_analyzer//unit_test//test_data//InputFileWithPunctuations.txt");
+    std::string inputFilePath = CWD + "InputFileWithPunctuations.txt";
+    textAnalyzer.findTenMostUsedWords(inputFilePath);
+	textAnalyzer.findSmileyPositions(inputFilePath);
 	textAnalyzer.writeOutputToTextFile();
 	ASSERT_TRUE(compareOutput(outputTxtFilePath, expectedOutput));
 }
@@ -84,8 +93,9 @@ TEST(TextAnalyzerTests, InputFileWithPunctuations) {
 TEST(TextAnalyzerTests, InputFileWithExtraSpaces) {
 	TextAnalyzer textAnalyzer{};
 	const std::string expectedOutput = {"Smileys and their positions :\nMost frequent 10 words :\n1.cxx\n2.executable\n3.linking\n"};
-    textAnalyzer.findTenMostUsedWords("..//text_analyzer//unit_test//test_data//InputFileWithExtraSpaces.txt");
-	textAnalyzer.findSmileyPositions("..//text_analyzer//unit_test//test_data//InputFileWithExtraSpaces.txt");
+    std::string inputFilePath = CWD + "InputFileWithExtraSpaces.txt";
+    textAnalyzer.findTenMostUsedWords(inputFilePath);
+	textAnalyzer.findSmileyPositions(inputFilePath);
 	textAnalyzer.writeOutputToTextFile();
 	ASSERT_TRUE(compareOutput(outputTxtFilePath, expectedOutput));
 }
@@ -93,8 +103,19 @@ TEST(TextAnalyzerTests, InputFileWithExtraSpaces) {
 TEST(TextAnalyzerTests, InputFileWithExtraSpaces_writeToXML) {
 	TextAnalyzer textAnalyzer{};
 	const std::string expectedOutput = {"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<TextAnalyzer>\n	<Frequent10Words>\n		<1>cxx</1>\n		<2>executable</2>\n		<3>linking</3>\n	</Frequent10Words>\n</TextAnalyzer>\n"};
-    textAnalyzer.findTenMostUsedWords("..//text_analyzer//unit_test//test_data//InputFileWithExtraSpaces.txt");
-	textAnalyzer.findSmileyPositions("..//text_analyzer//unit_test//test_data//InputFileWithExtraSpaces.txt");
+    std::string inputFilePath = CWD + "InputFileWithExtraSpaces.txt";
+    textAnalyzer.findTenMostUsedWords(inputFilePath);
+	textAnalyzer.findSmileyPositions(inputFilePath);
+	textAnalyzer.writeOutputToXMLFile();
+	ASSERT_TRUE(compareOutput(".//TextAnalyzerOutput.xml", expectedOutput));
+}
+
+TEST(TextAnalyzerTests, InputFileWithRepeatedSmileys_writeToXML) {
+	TextAnalyzer textAnalyzer{};
+	const std::string expectedOutput = {"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<TextAnalyzer>\n	<SmileyPosition>\n		<:(>6, 9</:(>\n		<:)>0</:)>\n		<:-[>2</:-[>\n	</SmileyPosition>\n</TextAnalyzer>\n"};
+    std::string inputFilePath = CWD + "InputFileWithRepeatedSmileys.txt";
+    textAnalyzer.findTenMostUsedWords(inputFilePath);
+	textAnalyzer.findSmileyPositions(inputFilePath);
 	textAnalyzer.writeOutputToXMLFile();
 	ASSERT_TRUE(compareOutput(".//TextAnalyzerOutput.xml", expectedOutput));
 }
