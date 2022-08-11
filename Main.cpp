@@ -8,12 +8,14 @@ namespace po = boost::program_options;
 int main(int argc, char** argv)
 {
     TextAnalyzer textAnalyzer{};
+    std::string inputFilePath;
 
     try
     {
         po::options_description desc{"Options"};
         desc.add_options()
         ("help,h", "Help screen")
+        ("file,f", po::value<std::string>(&inputFilePath), "Input file")
         ("console", "Writes ouput to Console")
         ("text", "Writes ouput to Text file")
         ("xml", "Writes ouput to XML file");
@@ -22,14 +24,16 @@ int main(int argc, char** argv)
         po::store(po::parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
 
-        textAnalyzer.findTenMostUsedWords("/home/dino/Documents/Job/CodingTask/BMW/input_data/data2.txt");
-        textAnalyzer.findSmileyPositions("/home/dino/Documents/Job/CodingTask/BMW/input_data/data1.txt");
-
-        if (vm.count("help"))
-        {
+        if ( vm.count("help") || argc == 1) {
             std::cout << desc << '\n';
             return 0;
         }
+        else if(vm.count("file"))
+        {
+            textAnalyzer.findTenMostUsedWords(inputFilePath);
+            textAnalyzer.findSmileyPositions(inputFilePath);
+        }
+
         if (vm.count("console"))
         {
             textAnalyzer.writeOutputToConsole();

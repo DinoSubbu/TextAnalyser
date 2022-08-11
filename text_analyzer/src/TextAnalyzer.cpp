@@ -8,14 +8,20 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-
 #define COUNT_MAX_USED_WORDS 10
 namespace pt = boost::property_tree;
 
+/**
+ * @brief read the input file from the path specified and push the content to a string variable
+ * 
+ * @param file_path 
+ * @return std::string 
+ */
 std::string read_string_from_file(std::string file_path) {
     const std::ifstream input_stream(file_path, std::ios_base::binary);
 
     if (input_stream.fail()) {
+        std::cout<<"Please check the input file. Exiting with an exception"<<std::endl;
         throw std::runtime_error("Failed to open file");
     }
 
@@ -25,6 +31,11 @@ std::string read_string_from_file(std::string file_path) {
     return buffer.str();
 }
 
+/**
+ * @brief Find smiley postions from the input file
+ * 
+ * @param file_path 
+ */
 void TextAnalyzer::findSmileyPositions(std::string file_path)
 {
     std::regex smileyPattern(":\\(|:\\)|:-\\]|:-\\[|:\\]|:\\[|:-\\(|:-\\)");
@@ -38,10 +49,16 @@ void TextAnalyzer::findSmileyPositions(std::string file_path)
         std::smatch m = *i;
         if (m[0].matched) {  
             smileyPositions<< m[0].str() << " --> " << m.position(0) << std::endl;
+            smileysWithPosition.emplace(m[0].str(), m.position(0));
         }
     }
 }
 
+/**
+ * @brief Find frequently used 10 words from the input file
+ * 
+ * @param file_path 
+ */
 void TextAnalyzer::findTenMostUsedWords(std::string file_path)
 {
     std::string input_text =read_string_from_file(file_path);
@@ -77,19 +94,32 @@ void TextAnalyzer::findTenMostUsedWords(std::string file_path)
     }
 }
 
+/**
+ * @brief Write frequent 10 words and smiley positions to the console
+ * 
+ */
 void TextAnalyzer::writeOutputToConsole()
 {
     std::cout << smileyPositions.str();
     std::cout << frequentTenWords.str();
 }
 
+/**
+ * @brief Write frequent 10 words and smiley positions to TextAnalyzerOutput.txt
+ * 
+ */
 void TextAnalyzer::writeOutputToTextFile()
 {
     std::ofstream outFile;
     outFile.open("TextAnalyzerOutput.txt");
     outFile << smileyPositions.str() << frequentTenWords.str();
+    outFile.close();
 }
 
+/**
+ * @brief Write frequent 10 words and smiley positions to TextAnalyzerOutput.xml
+ * 
+ */
 void TextAnalyzer::writeOutputToXMLFile()
 {
     pt::ptree tree;
@@ -100,10 +130,31 @@ void TextAnalyzer::writeOutputToXMLFile()
         tree.add(temp, word);
         ++i;
     }
-    pt::write_xml("TextAnalyzerOutput.xml", tree);
+    for(const auto &smileyWithPosition: smileysWithPosition){
+        std::cout << "Dino " << smileyWithPosition.first << smileyWithPosition.second << std::endl;
+        std::string temp{"TextAnalyzer.SmileyPosition."};
+        temp = temp + smileyWithPosition.first;
+        auto existingValue = tree.get_optional<std::string>(temp);
+        if (existingValue.has_value())
+        {
+            std::string positionToInsert{existingValue.value()};
+            positionToInsert.append(", " + std::to_string(smileyWithPosition.second));
+            tree.put(temp, positionToInsert);
+        }
+        else
+        {
+            tree.add(temp, std::to_string(smileyWithPosition.second));
+        }
+    }
+    pt::xml_writer_settings<std::string> settings('\t', 1);
+    pt::write_xml("TextAnalyzerOutput.xml", tree, std::locale(), settings);
 }
 
-// Removes extra spaces from input string and returns updated string
+/**
+ * @brief Remove extra spaces from input string and return updated string
+ * 
+ * @param input_text 
+ */
 void TextAnalyzer::removeExtraSpaces(std::string& input_text) {
     auto new_end_position = std::unique(input_text.begin(), input_text.end(), [] (char left, char right) {
         return ((left == right) && (left == ' '));
@@ -115,7 +166,11 @@ void TextAnalyzer::removeExtraSpaces(std::string& input_text) {
 }
 
 
-// Converts upper case alphabets to lower case and returns updated string
+/**
+ * @brief Convert upper case alphabets to lower case and return updated string
+ * 
+ * @param input_text 
+ */
 void TextAnalyzer::convertToLowerCase(std::string& input_text) {
     std::for_each(input_text.begin(), input_text.end(), [] (char& alphabet) {
         alphabet = std::tolower(alphabet);
@@ -123,8 +178,11 @@ void TextAnalyzer::convertToLowerCase(std::string& input_text) {
 }
 
 
-// Breaks down the input string into words and returns a vector of words
-// Reserved for future use
+/**
+ * @brief Break down the input string into words and store it into a vector of words
+ * 
+ * @param input_text 
+ */
 void TextAnalyzer::tokenize(std::string input_text) {
     std::string word = "";
     for(auto alphabet: input_text) {
@@ -142,14 +200,22 @@ void TextAnalyzer::tokenize(std::string input_text) {
         wordsVec.emplace_back(word);
 }
 
-// Removes punctuation marks from input string and returns updated string
+/**
+ * @brief remove punctuation marks from input string and return updated string
+ * 
+ * @param input_text 
+ */
 void TextAnalyzer::removePunctuations(std::string& input_text) {
     auto new_end_position = std::remove_if(input_text.begin(), input_text.end(), ispunct);
     input_text.erase(new_end_position, input_text.end());
 }
 
 
-// Processes input string by removing uppercases, punctuations & extra spaces
+/**
+ * @brief Process input string by removing uppercases, punctuations & extra spaces & tokenize to words
+ * 
+ * @param input_text 
+ */
 void TextAnalyzer::processInput(std::string& input_text) {
     removePunctuations(input_text);
     convertToLowerCase(input_text);
