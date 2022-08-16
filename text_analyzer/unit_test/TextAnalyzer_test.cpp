@@ -1,10 +1,8 @@
 #include <gtest/gtest.h>
 #include "TextAnalyzer.hpp"
 #include <fstream>
-#include <filesystem>
 
-using std::filesystem::current_path;
-std::string CWD = current_path().string() + "/../../../text_analyzer/unit_test/test_data/";
+std::string CWD = "/home/dino/Documents/Job/CodingTask/BMW/text_analyzer/unit_test/test_data/";
 
 bool compareOutput(std::string actualResultPath,std::string expectedOutput)
 {
